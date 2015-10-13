@@ -74,6 +74,8 @@ private:
 	// *** Fill me in ***
 	// You will want to declare some more matrices here
 	Matrix4x4 m_projection;
+    Point2D m_viewport[2];
+    Triangle m_demoTriangle;
 };
 
 #endif

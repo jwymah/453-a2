@@ -5,9 +5,20 @@
 
 // constructor
 Renderer::Renderer(QWidget *parent)
-	: QOpenGLWidget(parent)
+    : QOpenGLWidget(parent)
 {
+    // Setup orthogonal projection
+    m_projection = Matrix4x4(Vector4D(1,0,0,0),
+                             Vector4D(0,1,0,0),
+                             Vector4D(0,0,0,0),
+                             Vector4D(0,0,0,0));
 
+    // Setup a demo transform, translate and rotate
+    m_demoTriangle.appendTransform(
+                Matrix4x4(Vector4D(0.8660, 0,-0.5   , 10 ),
+                          Vector4D(0     , 1, 0     , 100),
+                          Vector4D(0.5   , 0, 0.8660, 0  ),
+                          Vector4D(0     , 0, 0     , 1  )));
 }
 
 // destructor
@@ -41,37 +52,70 @@ void Renderer::initializeGL()
 
 
 // called by the Qt GUI system, to allow OpenGL drawing commands
+//void Renderer::paintGL()
+//{
+//	// Here is where your drawing code should go.
+
+//	draw_init(width(), height());
+
+//	/* A few of lines are drawn below to show how it's done. */
+
+//	set_colour(Colour(0.1, 0.1, 0.1));
+
+//	draw_line(Point2D(0.1*width(), 0.1*height()),
+//		Point2D(0.9*width(), 0.9*height()));
+//	draw_line(Point2D(0.9*width(), 0.1*height()),
+//		Point2D(0.1*width(), 0.9*height()));
+
+//	draw_line(Point2D(0.1*width(), 0.1*height()),
+//		Point2D(0.2*width(), 0.1*height()));
+//	draw_line(Point2D(0.1*width(), 0.1*height()),
+//		Point2D(0.1*width(), 0.2*height()));
+
+//	draw_complete();
+	    
+//}
+
 void Renderer::paintGL()
 {
-	// Here is where your drawing code should go.
+    draw_init(width(), height());
 
-	draw_init(width(), height());
+    std::vector<Line3D> demoLines = m_demoTriangle.getLines();
+        Matrix4x4 model_matrix = m_demoTriangle.getTrasform();
 
-	/* A few of lines are drawn below to show how it's done. */
+        for(std::vector<Line3D>::iterator it = demoLines.begin(); it != demoLines.end(); ++it) {
 
-	set_colour(Colour(0.1, 0.1, 0.1));
+            Line3D line = *it;
+            // Get the points and apply the model matrix
+            Point3D p1 = model_matrix * line.getP1(), p2 = model_matrix * line.getP2();
 
-	draw_line(Point2D(0.1*width(), 0.1*height()), 
-		Point2D(0.9*width(), 0.9*height()));
-	draw_line(Point2D(0.9*width(), 0.1*height()),
-		Point2D(0.1*width(), 0.9*height()));
+            // Fill this in: Apply the view matrix
 
-	draw_line(Point2D(0.1*width(), 0.1*height()),
-		Point2D(0.2*width(), 0.1*height()));
-	draw_line(Point2D(0.1*width(), 0.1*height()), 
-		Point2D(0.1*width(), 0.2*height()));
+            // Fill this in: Do clipping here...
 
-	draw_complete();
-	    
+            // Apply the projection matrix
+            p1 = m_projection * p1;
+            p2 = m_projection * p2;
+
+            // Fill this in: Do clipping here (maybe)
+
+            draw_line(Point2D(p1[0], p1[1]), Point2D(p2[0], p2[1]));
+        }
+
+    // Draw viewport
+    draw_line(m_viewport[0], Point2D(m_viewport[0][0], m_viewport[1][1]));
+    draw_line(m_viewport[0], Point2D(m_viewport[1][0], m_viewport[0][1]));
+    draw_line(m_viewport[1], Point2D(m_viewport[1][0], m_viewport[0][1]));
+    draw_line(m_viewport[1], Point2D(m_viewport[0][0], m_viewport[1][1]));
+
+    draw_complete();
 }
 
 // called by the Qt GUI system, to allow OpenGL to respond to widget resizing
 void Renderer::resizeGL(int width, int height)
 {
-    // width() and height() are better methods to use
-    Q_UNUSED(width); Q_UNUSED(height);
-
-    // You might not have anything in here, might have viewport setup...
+    m_viewport[0] = Point2D(0.05*width, 0.05*height);
+    m_viewport[1] = Point2D(0.95*width, 0.95*height);
 }
 
 // override mouse press event

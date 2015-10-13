@@ -17,6 +17,7 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include <vector>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -486,4 +487,35 @@ inline std::ostream& operator <<(std::ostream& os, const Colour& c)
   return os << "c<" << c.R() << "," << c.G() << "," << c.B() << ">";
 }
 
+class Line3D
+{
+public:
+    Line3D();
+    ~Line3D();
+    Line3D(const Point3D &p1, Point3D &p2);
+    Line3D(const Line3D &other);
+    Point3D &getP1();
+    Point3D &getP2();
+private:
+    Point3D p1_, p2_;
+};
+
+class Triangle
+{
+public:
+    Triangle();
+    ~Triangle();
+
+    Matrix4x4 getTrasform() const;
+    void resetTransform();
+    void appendTransform(const Matrix4x4 &xform);
+
+    std::vector<Line3D> getLines();
+
+private:
+    std::vector<Point3D> verts_;
+    Matrix4x4 transform_;
+};
+
 #endif // ALGEBRA_H
+
