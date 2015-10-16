@@ -24,10 +24,10 @@ Renderer::Renderer(QWidget *parent)
                           Vector4D(0     , 0, 0     , 1  )));
 
     m_cube.appendTransform(
-                Matrix4x4(Vector4D(4, 0,-0.5   , 300 ),
-                          Vector4D(0     , 4, 0     , 0),
-                          Vector4D(0.5   , 0, 1, 0  ),
-                          Vector4D(0     , 0, 0     , 1  )));
+                Matrix4x4(Vector4D(  2,  0, -0.5, 200  ),
+                          Vector4D(  0,  2,    0, 100  ),
+                          Vector4D(0.5,  0,    2,   0  ),
+                          Vector4D(  0,  0,    0,   1  )));
 }
 
 // destructor
@@ -59,8 +59,7 @@ void Renderer::initializeGL()
     // You might not have anything in here, might have viewport & matrix setup...
 }
 
-
-// called by the Qt GUI system, to allow OpenGL drawing commands
+// clips a single point to edges of viewport
 Point3D Renderer::clipPoint(Point3D point)
 {
     if (point[0] < viewport_x_min)
@@ -82,7 +81,7 @@ Point3D Renderer::clipPoint(Point3D point)
     return point;
 }
 
-// clips point 1 with respect to point 2
+// clips point 1 with respect to point 2 to viewport space
 Point3D Renderer::clipLine(Point3D p1, Point3D p2)
 {
     float slope = ((float) p2[1] - p1[1]) / ((float) p2[0] - p1[0]);
@@ -110,12 +109,14 @@ Point3D Renderer::clipLine(Point3D p1, Point3D p2)
     return p1;
 }
 
+// called by the Qt GUI system, to allow OpenGL drawing commands
 void Renderer::paintGL()
 {
     draw_init(width(), height());
 
-
-    m_cube.appendTransform(rotation(1, 'z'));
+//    m_cube.appendTransform(rotation(1, 'z'));
+    m_cube.appendTransform(rotation(1, 'y'));
+//    m_cube.appendTransform(rotation(1, 'x'));
 
     std::vector<Line3D> demoLines = m_demoTriangle.getLines();
     Matrix4x4 model_matrix = m_demoTriangle.getTransform();
@@ -186,7 +187,6 @@ void Renderer::resizeGL(int width, int height)
 // override mouse press event
 void Renderer::mousePressEvent(QMouseEvent * event)
 {
-    m_cube.resetTransform();
     QTextStream cout(stdout);
     cout << "Stub: Button " << event->button() << " pressed.\n";
 }
