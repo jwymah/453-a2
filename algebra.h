@@ -506,7 +506,25 @@ public:
     Triangle();
     ~Triangle();
 
-    Matrix4x4 getTrasform() const;
+    Matrix4x4 getTransform() const;
+    void resetTransform();
+    void appendTransform(const Matrix4x4 &xform);
+
+    std::vector<Line3D> getLines();
+
+private:
+    std::vector<Point3D> verts_;
+    Matrix4x4 transform_;
+};
+
+
+class Cube
+{
+public:
+    Cube();
+    ~Cube();
+
+    Matrix4x4 getTransform() const;
     void resetTransform();
     void appendTransform(const Matrix4x4 &xform);
 

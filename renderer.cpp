@@ -1,7 +1,10 @@
 #include "renderer.h"
+#include "a2.h"
 
 #include <QTextStream>
 #include "draw.h"
+
+QTextStream cout(stdout);
 
 // constructor
 Renderer::Renderer(QWidget *parent)
@@ -15,9 +18,15 @@ Renderer::Renderer(QWidget *parent)
 
     // Setup a demo transform, translate and rotate
     m_demoTriangle.appendTransform(
-                Matrix4x4(Vector4D(0.8660, 0,-0.5   , 10 ),
-                          Vector4D(0     , 1, 0     , 100),
+                Matrix4x4(Vector4D(2, 0,-0.5   , 10 ),
+                          Vector4D(0     , 2, 0     , 10),
                           Vector4D(0.5   , 0, 0.8660, 0  ),
+                          Vector4D(0     , 0, 0     , 1  )));
+
+    m_cube.appendTransform(
+                Matrix4x4(Vector4D(4, 0,-0.5   , 300 ),
+                          Vector4D(0     , 4, 0     , 0),
+                          Vector4D(0.5   , 0, 1, 0  ),
                           Vector4D(0     , 0, 0     , 1  )));
 }
 
@@ -52,55 +61,107 @@ void Renderer::initializeGL()
 
 
 // called by the Qt GUI system, to allow OpenGL drawing commands
-//void Renderer::paintGL()
-//{
-//	// Here is where your drawing code should go.
+Point3D Renderer::clipPoint(Point3D point)
+{
+    if (point[0] < viewport_x_min)
+    {
+        point[0] = viewport_x_min;
+    }
+    if (point[0] > viewport_x_max)
+    {
+        point[0] = viewport_x_max;
+    }
+    if (point[1] < viewport_y_min)
+    {
+        point[1] = viewport_y_min;
+    }
+    if (point[1] > viewport_y_max)
+    {
+        point[1] = viewport_y_max;
+    }
+    return point;
+}
 
-//	draw_init(width(), height());
+// clips point 1 with respect to point 2
+Point3D Renderer::clipLine(Point3D p1, Point3D p2)
+{
+    float slope = ((float) p2[1] - p1[1]) / ((float) p2[0] - p1[0]);
 
-//	/* A few of lines are drawn below to show how it's done. */
-
-//	set_colour(Colour(0.1, 0.1, 0.1));
-
-//	draw_line(Point2D(0.1*width(), 0.1*height()),
-//		Point2D(0.9*width(), 0.9*height()));
-//	draw_line(Point2D(0.9*width(), 0.1*height()),
-//		Point2D(0.1*width(), 0.9*height()));
-
-//	draw_line(Point2D(0.1*width(), 0.1*height()),
-//		Point2D(0.2*width(), 0.1*height()));
-//	draw_line(Point2D(0.1*width(), 0.1*height()),
-//		Point2D(0.1*width(), 0.2*height()));
-
-//	draw_complete();
-	    
-//}
+    if (p1[0] < viewport_x_min)
+    {
+        p1[1] = p1[1] + (viewport_x_min - p1[0]) * slope;
+        p1[0] = viewport_x_min;
+    }
+    if (p1[0] > viewport_x_max)
+    {
+        p1[1] = p1[1] - (p1[0] - viewport_x_max) * slope;
+        p1[0] = viewport_x_max;
+    }
+    if (p1[1] < viewport_y_min)
+    {
+        p1[0] = p1[0] + ((viewport_y_min - p1[1]) / slope);
+        p1[1] = viewport_y_min;
+    }
+    if (p1[1] > viewport_y_max)
+    {
+        p1[0] = p1[0] - ((p1[1] - viewport_y_max) / slope);
+        p1[1] = viewport_y_max;
+    }
+    return p1;
+}
 
 void Renderer::paintGL()
 {
     draw_init(width(), height());
 
+
+    m_cube.appendTransform(rotation(1, 'z'));
+
     std::vector<Line3D> demoLines = m_demoTriangle.getLines();
-        Matrix4x4 model_matrix = m_demoTriangle.getTrasform();
+    Matrix4x4 model_matrix = m_demoTriangle.getTransform();
 
-        for(std::vector<Line3D>::iterator it = demoLines.begin(); it != demoLines.end(); ++it) {
+    for(std::vector<Line3D>::iterator it = demoLines.begin(); it != demoLines.end(); ++it) {
 
-            Line3D line = *it;
-            // Get the points and apply the model matrix
-            Point3D p1 = model_matrix * line.getP1(), p2 = model_matrix * line.getP2();
+        Line3D line = *it;
+        // Get the points and apply the model matrix
+        Point3D p1 = model_matrix * line.getP1(), p2 = model_matrix * line.getP2();
 
-            // Fill this in: Apply the view matrix
+        // Fill this in: Apply the view matrix
 
-            // Fill this in: Do clipping here...
+        // Fill this in: Do clipping here...
 
-            // Apply the projection matrix
-            p1 = m_projection * p1;
-            p2 = m_projection * p2;
+        // Apply the projection matrix
+        p1 = m_projection * p1;
+        p2 = m_projection * p2;
 
-            // Fill this in: Do clipping here (maybe)
+        // Fill this in: Do clipping here (maybe)
+        p1 = clipLine(p1,p2);
+        p2 = clipLine(p2,p1);
 
-            draw_line(Point2D(p1[0], p1[1]), Point2D(p2[0], p2[1]));
-        }
+        draw_line(Point2D(p1[0], p1[1]), Point2D(p2[0], p2[1]));
+    }
+    std::vector<Line3D> demoLinesCube = m_cube.getLines();
+    Matrix4x4 model_matrix_cube = m_cube.getTransform();
+
+    for(std::vector<Line3D>::iterator it = demoLinesCube.begin(); it != demoLinesCube.end(); ++it) {
+
+        Line3D line = *it;
+        // Get the points and apply the model matrix
+        Point3D p1 = model_matrix_cube * line.getP1(), p2 = model_matrix_cube * line.getP2();
+
+        // Fill this in: Apply the view matrix
+
+        // Fill this in: Do clipping here...
+
+        // Apply the projection matrix
+        p1 = m_projection * p1;
+        p2 = m_projection * p2;
+
+        p1 = clipLine(p1,p2);
+        p2 = clipLine(p2,p1);
+
+        draw_line(Point2D(p1[0], p1[1]), Point2D(p2[0], p2[1]));
+    }
 
     // Draw viewport
     draw_line(m_viewport[0], Point2D(m_viewport[0][0], m_viewport[1][1]));
@@ -114,13 +175,18 @@ void Renderer::paintGL()
 // called by the Qt GUI system, to allow OpenGL to respond to widget resizing
 void Renderer::resizeGL(int width, int height)
 {
-    m_viewport[0] = Point2D(0.05*width, 0.05*height);
-    m_viewport[1] = Point2D(0.95*width, 0.95*height);
+    m_viewport[0] = Point2D(10, 10);
+    m_viewport[1] = Point2D(width-10, height-10);
+    viewport_x_min = 10;
+    viewport_x_max = width-10;
+    viewport_y_min = 10;
+    viewport_y_max = height-10;
 }
 
 // override mouse press event
 void Renderer::mousePressEvent(QMouseEvent * event)
 {
+    m_cube.resetTransform();
     QTextStream cout(stdout);
     cout << "Stub: Button " << event->button() << " pressed.\n";
 }
@@ -137,6 +203,7 @@ void Renderer::mouseReleaseEvent(QMouseEvent * event)
 // override mouse move event
 void Renderer::mouseMoveEvent(QMouseEvent * event)
 {
+    update();
     QTextStream cout(stdout);
     cout << "Stub: Motion at " << event->x() << ", " << event->y() << ".\n";
 }

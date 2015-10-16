@@ -171,7 +171,7 @@ Triangle::Triangle()
 
 Triangle::~Triangle() { }
 
-Matrix4x4 Triangle::getTrasform() const
+Matrix4x4 Triangle::getTransform() const
 {
     return this->transform_;
 }
@@ -188,6 +188,50 @@ void Triangle::appendTransform(const Matrix4x4 &xform)
 }
 
 std::vector<Line3D> Triangle::getLines()
+{
+    std::vector<Line3D> lines;
+
+    for(std::vector<Point3D>::iterator it = verts_.begin(); it != verts_.end(); ++it)
+    {
+        Point3D p1 = *it, p2 = *(++it);
+        lines.push_back(Line3D(p1,p2));
+    }
+    return lines;
+}
+///////////
+
+
+Cube::Cube()
+{
+    verts_.push_back(Point3D(0,0,0));
+    verts_.push_back(Point3D(0,100,0));
+    verts_.push_back(Point3D(0,100,0));
+    verts_.push_back(Point3D(100,100,0));
+    verts_.push_back(Point3D(100,100,0));
+    verts_.push_back(Point3D(100,0,0));
+    verts_.push_back(Point3D(100,0,0));
+    verts_.push_back(Point3D(0,0,0));
+}
+
+Cube::~Cube() { }
+
+Matrix4x4 Cube::getTransform() const
+{
+    return this->transform_;
+}
+
+void Cube::resetTransform()
+{
+    this->transform_ = Matrix4x4();
+}
+
+
+void Cube::appendTransform(const Matrix4x4 &xform)
+{
+    this->transform_ = this->transform_ * xform;
+}
+
+std::vector<Line3D> Cube::getLines()
 {
     std::vector<Line3D> lines;
 

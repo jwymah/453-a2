@@ -7,6 +7,8 @@
 
 #include "algebra.h"
 
+using namespace std;
+
 // The "main" OpenGL widget
 class Renderer : public QOpenGLWidget, protected QOpenGLFunctions {
 
@@ -38,6 +40,8 @@ public:
 	void reset_view();
 
 
+    Point3D clipPoint(Point3D point);
+    Point3D clipLine(Point3D p1, Point3D p2);
 protected:
 
 	// Events we implement
@@ -72,10 +76,17 @@ protected:
 private:
 
 	// *** Fill me in ***
-	// You will want to declare some more matrices here
+    // You will want to declare some more matrices here
 	Matrix4x4 m_projection;
     Point2D m_viewport[2];
+    double viewport_x_min;
+    double viewport_x_max;
+    double viewport_y_min;
+    double viewport_y_max;
+
     Triangle m_demoTriangle;
+
+    Cube m_cube;
 };
 
 #endif
