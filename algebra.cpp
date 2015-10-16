@@ -203,6 +203,7 @@ std::vector<Line3D> Triangle::getLines()
 
 Cube::Cube()
 {
+    //front ?
     verts_.push_back(Point3D(0,0,0));
     verts_.push_back(Point3D(0,100,0));
     verts_.push_back(Point3D(0,100,0));
@@ -211,13 +212,39 @@ Cube::Cube()
     verts_.push_back(Point3D(100,0,0));
     verts_.push_back(Point3D(100,0,0));
     verts_.push_back(Point3D(0,0,0));
+
+    //back
+    verts_.push_back(Point3D(0,0,100));
+    verts_.push_back(Point3D(0,100,100));
+    verts_.push_back(Point3D(0,100,100));
+    verts_.push_back(Point3D(100,100,100));
+    verts_.push_back(Point3D(100,100,100));
+    verts_.push_back(Point3D(100,0,100));
+    verts_.push_back(Point3D(100,0,100));
+    verts_.push_back(Point3D(0,0,100));
+
+    //top
+    verts_.push_back(Point3D(0,  100,   0   ));
+    verts_.push_back(Point3D(0,  100,   100 ));
+    verts_.push_back(Point3D(100,100,   0   ));
+    verts_.push_back(Point3D(100,100,   100 ));
+
+    //bottom
+    verts_.push_back(Point3D(0,   0,    0   ));
+    verts_.push_back(Point3D(0,   0,    100 ));
+    verts_.push_back(Point3D(100, 0,    0   ));
+    verts_.push_back(Point3D(100, 0,    100 ));
+
+    scale_factor_x = 1.0;
+    scale_factor_y = 1.0;
+    scale_factor_z = 1.0;
 }
 
 Cube::~Cube() { }
 
 Matrix4x4 Cube::getTransform() const
 {
-    return this->transform_;
+    return this->transform_ * this->getScaleTransform();
 }
 
 void Cube::resetTransform()
@@ -225,10 +252,30 @@ void Cube::resetTransform()
     this->transform_ = Matrix4x4();
 }
 
-
 void Cube::appendTransform(const Matrix4x4 &xform)
 {
     this->transform_ = this->transform_ * xform;
+}
+
+void Cube::setScaleX(float scale)
+{
+    scale_factor_x = scale;
+}
+void Cube::setScaleY(float scale)
+{
+    scale_factor_y = scale;
+}
+void Cube::setScaleZ(float scale)
+{
+    scale_factor_z = scale;
+}
+
+Matrix4x4 Cube::getScaleTransform() const
+{
+    return Matrix4x4(Vector4D(scale_factor_x, 0, 0, 0),
+                     Vector4D(0, scale_factor_y, 0, 0),
+                     Vector4D(0, 0, scale_factor_z, 0),
+                     Vector4D(0, 0, 0, 1));
 }
 
 std::vector<Line3D> Cube::getLines()

@@ -24,10 +24,21 @@ Renderer::Renderer(QWidget *parent)
                           Vector4D(0     , 0, 0     , 1  )));
 
     m_cube.appendTransform(
-                Matrix4x4(Vector4D(  2,  0, -0.5, 200  ),
-                          Vector4D(  0,  2,    0, 100  ),
-                          Vector4D(0.5,  0,    2,   0  ),
+                Matrix4x4(Vector4D(  1,  0, -0.5, 200  ),
+                          Vector4D(  0,  1,    0, 100  ),
+                          Vector4D(0.5,  0,    1,   0  ),
                           Vector4D(  0,  0,    0,   1  )));
+
+    mouse_x = 0;
+    mouse_left = false;
+    mouse_middle = false;
+    mouse_right = false;
+
+    mode_rotate = false;
+    mode_scale = true;
+    mode_translate = false;
+
+
 }
 
 // destructor
@@ -114,10 +125,6 @@ void Renderer::paintGL()
 {
     draw_init(width(), height());
 
-//    m_cube.appendTransform(rotation(1, 'z'));
-    m_cube.appendTransform(rotation(1, 'y'));
-//    m_cube.appendTransform(rotation(1, 'x'));
-
     std::vector<Line3D> demoLines = m_demoTriangle.getLines();
     Matrix4x4 model_matrix = m_demoTriangle.getTransform();
 
@@ -188,17 +195,41 @@ void Renderer::resizeGL(int width, int height)
 void Renderer::mousePressEvent(QMouseEvent * event)
 {
     QTextStream cout(stdout);
-    cout << "Stub: Button " << event->button() << " pressed.\n";
-}
+    cout << "Stub: Button " << event->button() << " released.\n";
 
+    if (event->button() == 1)
+    {
+        mouse_left = true;
+    }
+    if (event->button() == 4)
+    {
+        mouse_middle = true;
+    }
+    if (event->button() == 2)
+    {
+        mouse_right = true;
+    }
+    mouse_x = 0;
+}
 
 // override mouse release event
 void Renderer::mouseReleaseEvent(QMouseEvent * event)
 {
     QTextStream cout(stdout);
     cout << "Stub: Button " << event->button() << " released.\n";
+    if (event->button() == 1)
+    {
+        mouse_left = false;
+    }
+    else if (event->button() == 4)
+    {
+        mouse_middle = false;
+    }
+    else if (event->button() == 2)
+    {
+        mouse_right = false;
+    }
 }
-
 
 // override mouse move event
 void Renderer::mouseMoveEvent(QMouseEvent * event)
@@ -206,5 +237,69 @@ void Renderer::mouseMoveEvent(QMouseEvent * event)
     update();
     QTextStream cout(stdout);
     cout << "Stub: Motion at " << event->x() << ", " << event->y() << ".\n";
-}
+    if (mouse_x == 0)
+    {
+        mouse_x = event->x();
+        return;
+    }
 
+    magnitude = mouse_x - event->x();
+    cout << "magnitude: " << magnitude << endl;
+
+    if (mode_scale)
+    {
+        if (mouse_left)
+        {
+            m_cube.scale_factor_x -= ((float) magnitude) / 100;
+            if (m_cube.scale_factor_x < 0)
+                m_cube.scale_factor_x = 0.0;
+        }
+        if (mouse_middle)
+        {
+            m_cube.scale_factor_y -= ((float) magnitude) / 100;
+            if (m_cube.scale_factor_y < 0)
+                m_cube.scale_factor_y = 0.0;
+        }
+        if (mouse_right)
+        {
+            m_cube.scale_factor_z -= ((float) magnitude) / 100;
+            if (m_cube.scale_factor_z < 0)
+                m_cube.scale_factor_z = 0.0;
+        }
+    }
+
+    if (mode_rotate)
+    {
+        if (mouse_left)
+        {
+            m_cube.appendTransform(rotation(magnitude, 'x'));
+        }
+        if (mouse_middle)
+        {
+            m_cube.appendTransform(rotation(magnitude, 'y'));
+        }
+        if (mouse_right)
+        {
+            m_cube.appendTransform(rotation(magnitude, 'z'));
+        }
+    }
+
+    if (mode_translate)
+    {
+        if (mouse_left)
+        {
+            m_cube.appendTransform(translation(Vector3D(magnitude, 0, 0)));
+        }
+        if (mouse_middle)
+        {
+            m_cube.appendTransform(translation(Vector3D(0, magnitude, 0)));
+        }
+        if (mouse_right)
+        {
+            m_cube.appendTransform(translation(Vector3D(0, 0, magnitude)));
+        }
+
+    }
+    std::cout << m_cube.getTransform() << endl;
+    mouse_x = event->x();
+}

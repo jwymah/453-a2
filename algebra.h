@@ -528,6 +528,16 @@ public:
     void resetTransform();
     void appendTransform(const Matrix4x4 &xform);
 
+    float scale_factor_x;
+    float scale_factor_y;
+    float scale_factor_z;
+
+    void setScaleX(float scale);
+    void setScaleY(float scale);
+    void setScaleZ(float scale);
+
+    Matrix4x4 getScaleTransform() const;
+
     std::vector<Line3D> getLines();
 
 private:

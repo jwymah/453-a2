@@ -84,6 +84,17 @@ private:
     double viewport_y_min;
     double viewport_y_max;
 
+    int mouse_x;
+    bool mouse_left;
+    bool mouse_middle;
+    bool mouse_right;
+
+    bool mode_rotate;
+    bool mode_translate;
+    bool mode_scale;
+
+    int magnitude;
+
     Triangle m_demoTriangle;
 
     Cube m_cube;

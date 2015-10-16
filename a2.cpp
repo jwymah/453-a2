@@ -12,16 +12,16 @@ Matrix4x4 rotation(double angle, char axis)
     switch(axis)
     {
     case 'x':
-              r = Matrix4x4(Vector4D(1,          0,            0,  0  ),
-                            Vector4D(0, cos(angle),  -sin(angle),  0  ),
-                            Vector4D(0, sin(angle),   cos(angle),  0  ),
-                            Vector4D(0,          0,            0,  1  ));
+              r = Matrix4x4(Vector4D(1,             0,                0,  0  ),
+                            Vector4D(0,    cos(angle),      -sin(angle),  0  ),
+                            Vector4D(0,    sin(angle),       cos(angle),  0  ),
+                            Vector4D(0,             0,                0,  1  ));
         break;
     case 'y':
-              r = Matrix4x4(Vector4D( cos(angle),  0, sin(angle),  0  ),
-                            Vector4D(          0,  1,          0,  0  ),
-                            Vector4D(-sin(angle),  0, cos(angle),  0  ),
-                            Vector4D(          0,  0,          0,  1  ));
+              r = Matrix4x4(Vector4D( cos(angle),   0,       sin(angle),  0  ),
+                            Vector4D(          0,   1,                0,  0  ),
+                            Vector4D(-sin(angle),   0,       cos(angle),  0  ),
+                            Vector4D(          0,   0,                0,  1  ));
         break;
     case 'z':
               r = Matrix4x4(Vector4D(cos(angle), -sin(angle),  0,  0  ),
@@ -30,16 +30,15 @@ Matrix4x4 rotation(double angle, char axis)
                             Vector4D(         0,           0,  0,  1  ));
         break;
     }
-    std::cout << r << std::endl;
   return r;
 }
 
 // Return a matrix to represent a displacement of the given vector.
 Matrix4x4 translation(const Vector3D& displacement)
 {
-    Matrix4x4 t = Matrix4x4(Vector4D(0,   0,  0,  displacement[0]  ),
-                            Vector4D(0,   0,  0,  displacement[1]  ),
-                            Vector4D(0,   0,  0,  displacement[2]  ),
+    Matrix4x4 t = Matrix4x4(Vector4D(1,   0,  0,  displacement[0]  ),
+                            Vector4D(0,   1,  0,  displacement[1]  ),
+                            Vector4D(0,   0,  1,  displacement[2]  ),
                             Vector4D(0,   0,  0,  1    ));
   return t;
 }
