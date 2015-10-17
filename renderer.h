@@ -38,7 +38,9 @@ public:
 	// Restore all the transforms and perspective parameters to their
 	// original state. Set the viewport to its initial size.
 	void reset_view();
-
+    void setModeModelRotate();
+    void setModeModelScale();
+    void setModeModelTranslate();
 
     Point3D clipPoint(Point3D point);
     Point3D clipLine(Point3D p1, Point3D p2);
@@ -89,9 +91,9 @@ private:
     bool mouse_middle;
     bool mouse_right;
 
-    bool mode_rotate;
-    bool mode_translate;
-    bool mode_scale;
+    bool mode_model_rotate;
+    bool mode_model_translate;
+    bool mode_model_scale;
 
     int magnitude;
 

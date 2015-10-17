@@ -20,6 +20,12 @@ public:
 
 protected:
 
+private slots:
+    void resetView();
+    void modeModelRotate();
+    void modeModelScale();
+    void modeModelTranslate();
+
 private:
 	// The main OpenGL area
     Renderer * renderer;
@@ -27,9 +33,17 @@ private:
 	// Menu items and actions
 	QMenu * mFileMenu;
 	QAction * mQuitAction;
+    QAction * mResetAction;
+
+    QActionGroup * mModeGroup;
+    QMenu * mModeMenu;
+    QAction * mModeModelRotate;
+    QAction * mModeModelScale;
+    QAction * mModeModelTranslate;
 
 	// helper function for creating actions
-	void createActions();
+    void createFileActions();
+    void createModeActions();
 };
 
 #endif

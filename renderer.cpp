@@ -23,22 +23,13 @@ Renderer::Renderer(QWidget *parent)
                           Vector4D(0.5   , 0, 0.8660, 0  ),
                           Vector4D(0     , 0, 0     , 1  )));
 
-    m_cube.appendTransform(
-                Matrix4x4(Vector4D(  1,  0, -0.5, 200  ),
-                          Vector4D(  0,  1,    0, 100  ),
-                          Vector4D(0.5,  0,    1,   0  ),
-                          Vector4D(  0,  0,    0,   1  )));
-
     mouse_x = 0;
     mouse_left = false;
     mouse_middle = false;
     mouse_right = false;
 
-    mode_rotate = false;
-    mode_scale = true;
-    mode_translate = false;
-
-
+    reset_view();
+    setModeModelRotate();
 }
 
 // destructor
@@ -61,7 +52,37 @@ void Renderer::set_perspective(double fov, double aspect,
 
 void Renderer::reset_view()
 {
-    // Fill me in!
+    m_cube.resetTransform();
+    m_cube.appendTransform(
+                Matrix4x4(Vector4D(  1,  0, -0.5, 200  ),
+                          Vector4D(  0,  1,    0, 100  ),
+                          Vector4D(0.5,  0,    1,   0  ),
+                          Vector4D(  0,  0,    0,   1  )));
+    update();
+}
+
+void Renderer::setModeModelRotate()
+{
+    mode_model_rotate = true;
+    mode_model_scale = false;
+    mode_model_translate = false;
+    update();
+}
+
+void Renderer::setModeModelScale()
+{
+    mode_model_rotate = false;
+    mode_model_scale = true;
+    mode_model_translate = false;
+    update();
+}
+
+void Renderer::setModeModelTranslate()
+{
+    mode_model_rotate = false;
+    mode_model_scale = false;
+    mode_model_translate = true;
+    update();
 }
 
 // called once by Qt GUI system, to allow initialization for OpenGL requirements
@@ -246,7 +267,7 @@ void Renderer::mouseMoveEvent(QMouseEvent * event)
     magnitude = mouse_x - event->x();
     cout << "magnitude: " << magnitude << endl;
 
-    if (mode_scale)
+    if (mode_model_scale)
     {
         if (mouse_left)
         {
@@ -268,7 +289,7 @@ void Renderer::mouseMoveEvent(QMouseEvent * event)
         }
     }
 
-    if (mode_rotate)
+    if (mode_model_rotate)
     {
         if (mouse_left)
         {
@@ -284,7 +305,7 @@ void Renderer::mouseMoveEvent(QMouseEvent * event)
         }
     }
 
-    if (mode_translate)
+    if (mode_model_translate)
     {
         if (mouse_left)
         {

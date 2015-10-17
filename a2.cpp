@@ -36,7 +36,7 @@ Matrix4x4 rotation(double angle, char axis)
 // Return a matrix to represent a displacement of the given vector.
 Matrix4x4 translation(const Vector3D& displacement)
 {
-    Matrix4x4 t = Matrix4x4(Vector4D(1,   0,  0,  displacement[0]  ),
+    Matrix4x4 t = Matrix4x4(Vector4D(1,   0,  0,  -displacement[0]  ),
                             Vector4D(0,   1,  0,  displacement[1]  ),
                             Vector4D(0,   0,  1,  displacement[2]  ),
                             Vector4D(0,   0,  0,  1    ));
