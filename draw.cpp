@@ -21,7 +21,6 @@ void draw_line(const Point2D& p, const Point2D& q)
 {
 	QOpenGLFunctions glFuncs(QOpenGLContext::currentContext());
     glFuncs.initializeOpenGLFunctions(); // Qt support for inline GL function calls
-
 	glVertex2d(p[0], p[1]);
 	glVertex2d(q[0], q[1]);
 }

@@ -52,11 +52,14 @@ void Renderer::set_perspective(double fov, double aspect,
 
 void Renderer::reset_view()
 {
+    fov = 90;
+    n = 100;
+    f = 10000;
     m_cube.resetTransform();
-    m_cube.appendTransform(
-                Matrix4x4(Vector4D(  1,  0, -0.5, 200  ),
+    m_cube.appendTranslationTransform(
+                Matrix4x4(Vector4D(  1,  0,    0, 200  ),
                           Vector4D(  0,  1,    0, 100  ),
-                          Vector4D(0.5,  0,    1,   0  ),
+                          Vector4D(  0,  0,    1,   0  ),
                           Vector4D(  0,  0,    0,   1  )));
     update();
 }
@@ -172,20 +175,42 @@ void Renderer::paintGL()
     std::vector<Line3D> demoLinesCube = m_cube.getLines();
     Matrix4x4 model_matrix_cube = m_cube.getTransform();
 
+    flTanThetaOver2 = tan((((fov/2) * 3.14159) / 360));
+//    m_projection = Matrix4x4(Vector4D(1/flTanThetaOver2,0,0,0),
+//                             Vector4D(0,(aspectRatio / flTanThetaOver2),0,0),
+//                             Vector4D(0,0, (n+f)/(f-n),-(2*n*f)/(f-n)),
+//                             Vector4D(0,0, 1,0));
+    m_projection = Matrix4x4(Vector4D(aspectRatio/flTanThetaOver2,0,0,0),
+                             Vector4D(0,1/(aspectRatio * flTanThetaOver2),0,0),
+                             Vector4D(0,0, (n+f)/(f-n),-(2*n*f)/(f-n)),
+                             Vector4D(0,0, 1,0));
+
+    n++;
+    f++;
+
     for(std::vector<Line3D>::iterator it = demoLinesCube.begin(); it != demoLinesCube.end(); ++it) {
 
         Line3D line = *it;
         // Get the points and apply the model matrix
-        Point3D p1 = model_matrix_cube * line.getP1(), p2 = model_matrix_cube * line.getP2();
+        Point3D p1 = model_matrix_cube * line.getP1();
+        Point3D p2 = model_matrix_cube * line.getP2();
 
         // Fill this in: Apply the view matrix
+//        p1 = view_matrix * p1;
+//        p2 = view_matrix * p2;
 
-        // Fill this in: Do clipping here...
+        // Fill this in: Do clipping here... near/far
 
         // Apply the projection matrix
+        // projection matrix provides the illusion of perspective
         p1 = m_projection * p1;
         p2 = m_projection * p2;
 
+        //homogenize
+//        p1 = homogenize(p1);
+//        p2 = homogenize(p2);
+
+        // clipping for viewport..?
         p1 = clipLine(p1,p2);
         p2 = clipLine(p2,p1);
 
@@ -210,6 +235,7 @@ void Renderer::resizeGL(int width, int height)
     viewport_x_max = width-10;
     viewport_y_min = 10;
     viewport_y_max = height-10;
+    aspectRatio = (float) width / height;
 }
 
 // override mouse press event
@@ -293,15 +319,15 @@ void Renderer::mouseMoveEvent(QMouseEvent * event)
     {
         if (mouse_left)
         {
-            m_cube.appendTransform(rotation(magnitude, 'x'));
+            m_cube.appendRotationTransform(rotation(magnitude, 'x'));
         }
         if (mouse_middle)
         {
-            m_cube.appendTransform(rotation(magnitude, 'y'));
+            m_cube.appendRotationTransform(rotation(magnitude, 'y'));
         }
         if (mouse_right)
         {
-            m_cube.appendTransform(rotation(magnitude, 'z'));
+            m_cube.appendRotationTransform(rotation(magnitude, 'z'));
         }
     }
 
@@ -309,15 +335,15 @@ void Renderer::mouseMoveEvent(QMouseEvent * event)
     {
         if (mouse_left)
         {
-            m_cube.appendTransform(translation(Vector3D(magnitude, 0, 0)));
+            m_cube.appendTranslationTransform(translation(Vector3D(magnitude, 0, 0)));
         }
         if (mouse_middle)
         {
-            m_cube.appendTransform(translation(Vector3D(0, magnitude, 0)));
+            m_cube.appendTranslationTransform(translation(Vector3D(0, magnitude, 0)));
         }
         if (mouse_right)
         {
-            m_cube.appendTransform(translation(Vector3D(0, 0, magnitude)));
+            m_cube.appendTranslationTransform(translation(Vector3D(0, 0, magnitude)));
         }
 
     }

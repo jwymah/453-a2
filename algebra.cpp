@@ -244,17 +244,24 @@ Cube::~Cube() { }
 
 Matrix4x4 Cube::getTransform() const
 {
-    return this->transform_ * this->getScaleTransform();
+    return this->translationTransform_ * rotationTransform_ * this->getScaleTransform();
 }
 
 void Cube::resetTransform()
 {
-    this->transform_ = Matrix4x4();
+    this->translationTransform_= Matrix4x4();
+    this->rotationTransform_ = (Matrix4x4());
+    this->setScaleX(1);
+    this->setScaleY(1);
+    this->setScaleZ(1);
 }
-
-void Cube::appendTransform(const Matrix4x4 &xform)
+void Cube::appendTranslationTransform(const Matrix4x4 &xform)
 {
-    this->transform_ = this->transform_ * xform;
+    this->translationTransform_ = this->translationTransform_ * xform;
+}
+void Cube::appendRotationTransform(const Matrix4x4 &xform)
+{
+    this->rotationTransform_ = this->rotationTransform_ * xform;
 }
 
 void Cube::setScaleX(float scale)

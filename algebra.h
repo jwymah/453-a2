@@ -524,9 +524,12 @@ public:
     Cube();
     ~Cube();
 
-    Matrix4x4 getTransform() const;
+    Matrix4x4 getTransform() const; //TODO: possibly split this up to get individual xforms
+    Matrix4x4 getGnominTransform() const;
     void resetTransform();
     void appendTransform(const Matrix4x4 &xform);
+    void appendTranslationTransform(const Matrix4x4 &xform);
+    void appendRotationTransform(const Matrix4x4 &xform);
 
     float scale_factor_x;
     float scale_factor_y;
@@ -542,7 +545,8 @@ public:
 
 private:
     std::vector<Point3D> verts_;
-    Matrix4x4 transform_;
+    Matrix4x4 translationTransform_;
+    Matrix4x4 rotationTransform_;
 };
 
 #endif // ALGEBRA_H

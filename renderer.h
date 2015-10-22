@@ -85,6 +85,12 @@ private:
     double viewport_x_max;
     double viewport_y_min;
     double viewport_y_max;
+    float aspectRatio;
+    float flTanThetaOver2;
+    float fov;
+
+    float n;
+    float f;
 
     int mouse_x;
     bool mouse_left;
