@@ -178,8 +178,8 @@ void Renderer::paintGL()
 //                             Vector4D(0,(aspectRatio / flTanThetaOver2),0,0),
 //                             Vector4D(0,0, (n+f)/(f-n),-(2*n*f)/(f-n)),
 //                             Vector4D(0,0, 1,0));
-    m_projection = Matrix4x4(Vector4D(aspectRatio/flTanThetaOver2,0,0,0),
-                             Vector4D(0,1/(aspectRatio * flTanThetaOver2),0,0),
+    m_projection = Matrix4x4(Vector4D(1/flTanThetaOver2,0,0,0),
+                             Vector4D(0,(aspectRatio / flTanThetaOver2),0,0),
                              Vector4D(0,0, (n+f)/(f-n),-(2*n*f)/(f-n)),
                              Vector4D(0,0, 1,0));
 //    m_projection[0][0] = 1;
