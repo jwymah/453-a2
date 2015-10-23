@@ -200,6 +200,50 @@ std::vector<Line3D> Triangle::getLines()
 }
 ///////////
 
+Gnomon::Gnomon()
+{
+    verts_.push_back(Point3D(0,0,0));
+    verts_.push_back(Point3D(50,0,0));
+    verts_.push_back(Point3D(0,0,0));
+    verts_.push_back(Point3D(0,50,0));
+    verts_.push_back(Point3D(0,0,0));
+    verts_.push_back(Point3D(0,0,50));
+}
+
+Gnomon::~Gnomon() {}
+Matrix4x4 Gnomon::getTransform() const
+{
+    return this->translationTransform_ * rotationTransform_;
+//    return rotationTransform_ * this->translationTransform_;
+}
+
+void Gnomon::resetTransform()
+{
+    this->translationTransform_ = Matrix4x4();
+    this->rotationTransform_ = Matrix4x4();
+}
+
+void Gnomon::appendTranslationTransform(const Matrix4x4 &xform)
+{
+    this->translationTransform_ = this->translationTransform_ * xform;
+}
+
+void Gnomon::appendRotationTransform(const Matrix4x4 &xform)
+{
+    this->rotationTransform_ = this->rotationTransform_ * xform;
+}
+
+std::vector<Line3D> Gnomon::getLines()
+{
+    std::vector<Line3D> lines;
+
+    for(std::vector<Point3D>::iterator it = verts_.begin(); it != verts_.end(); ++it)
+    {
+        Point3D p1 = *(it++), p2 = *it;
+        lines.push_back(Line3D(p1,p2));
+    }
+    return lines;
+}
 
 Cube::Cube()
 {
@@ -244,12 +288,23 @@ Cube::~Cube() { }
 
 Matrix4x4 Cube::getTransform() const
 {
-    return this->translationTransform_ * rotationTransform_ * this->getScaleTransform();
+    Matrix4x4 other = Matrix4x4(Vector4D(1,   0,  0,  -50*scale_factor_x  ),
+                                Vector4D(0,   1,  0,  -50*scale_factor_y  ),
+                                Vector4D(0,   0,  1,  -50*scale_factor_z  ),
+                                Vector4D(0,   0,  0,  1    ));
+
+    return this->translationTransform_ * rotationTransform_ * other *this->getScaleTransform();
+//    return this->getScaleTransform() * rotationTransform_ * this->translationTransform_;
 }
 
 void Cube::resetTransform()
 {
+    this->gnomon.resetTransform();
+
     this->translationTransform_= Matrix4x4();
+//    this->translationTransform_[0][3] = -50;
+//    this->translationTransform_[1][3] = -50;
+//    this->translationTransform_[2][3] = -50;
     this->rotationTransform_ = (Matrix4x4());
     this->setScaleX(1);
     this->setScaleY(1);
@@ -257,10 +312,12 @@ void Cube::resetTransform()
 }
 void Cube::appendTranslationTransform(const Matrix4x4 &xform)
 {
+    this->gnomon.appendTranslationTransform(xform);
     this->translationTransform_ = this->translationTransform_ * xform;
 }
 void Cube::appendRotationTransform(const Matrix4x4 &xform)
 {
+    this->gnomon.appendRotationTransform(xform);
     this->rotationTransform_ = this->rotationTransform_ * xform;
 }
 

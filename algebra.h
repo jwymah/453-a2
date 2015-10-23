@@ -517,6 +517,23 @@ private:
     Matrix4x4 transform_;
 };
 
+class Gnomon
+{
+public:
+    Matrix4x4 getTransform() const;
+    void resetTransform();
+    void appendTranslationTransform(const Matrix4x4 &xform);
+    void appendRotationTransform(const Matrix4x4 &xform);
+
+    std::vector<Line3D> getLines();
+    Gnomon();
+    ~Gnomon();
+
+private:
+    std::vector<Point3D> verts_;
+    Matrix4x4 translationTransform_;
+    Matrix4x4 rotationTransform_;
+};
 
 class Cube
 {
@@ -525,7 +542,7 @@ public:
     ~Cube();
 
     Matrix4x4 getTransform() const; //TODO: possibly split this up to get individual xforms
-    Matrix4x4 getGnominTransform() const;
+    Gnomon gnomon;
     void resetTransform();
     void appendTransform(const Matrix4x4 &xform);
     void appendTranslationTransform(const Matrix4x4 &xform);

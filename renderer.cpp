@@ -57,7 +57,7 @@ void Renderer::reset_view()
     f = 10000;
     m_cube.resetTransform();
     m_cube.appendTranslationTransform(
-                Matrix4x4(Vector4D(  1,  0,    0, 200  ),
+                Matrix4x4(Vector4D(  1,  0,    0, 100  ),
                           Vector4D(  0,  1,    0, 100  ),
                           Vector4D(  0,  0,    1,   0  ),
                           Vector4D(  0,  0,    0,   1  )));
@@ -171,11 +171,9 @@ void Renderer::paintGL()
         p2 = clipLine(p2,p1);
 
         draw_line(Point2D(p1[0], p1[1]), Point2D(p2[0], p2[1]));
-    }
-    std::vector<Line3D> demoLinesCube = m_cube.getLines();
-    Matrix4x4 model_matrix_cube = m_cube.getTransform();
+    };
 
-    flTanThetaOver2 = tan((((fov/2) * 3.14159) / 360));
+    flTanThetaOver2 = tan((((fov/2) * 3.14159) / 180));
 //    m_projection = Matrix4x4(Vector4D(1/flTanThetaOver2,0,0,0),
 //                             Vector4D(0,(aspectRatio / flTanThetaOver2),0,0),
 //                             Vector4D(0,0, (n+f)/(f-n),-(2*n*f)/(f-n)),
@@ -184,10 +182,14 @@ void Renderer::paintGL()
                              Vector4D(0,1/(aspectRatio * flTanThetaOver2),0,0),
                              Vector4D(0,0, (n+f)/(f-n),-(2*n*f)/(f-n)),
                              Vector4D(0,0, 1,0));
+//    m_projection[0][0] = 1;
+//    m_projection[1][1] = 1;
 
     n++;
     f++;
 
+    std::vector<Line3D> demoLinesCube = m_cube.getLines();
+    Matrix4x4 model_matrix_cube = m_cube.getTransform();
     for(std::vector<Line3D>::iterator it = demoLinesCube.begin(); it != demoLinesCube.end(); ++it) {
 
         Line3D line = *it;
@@ -195,6 +197,38 @@ void Renderer::paintGL()
         Point3D p1 = model_matrix_cube * line.getP1();
         Point3D p2 = model_matrix_cube * line.getP2();
 
+        // Fill this in: Apply the view matrix
+//        p1 = view_matrix * p1;
+//        p2 = view_matrix * p2;
+
+        // Fill this in: Do clipping here... near/far
+
+        // Apply the projection matrix
+        // projection matrix provides the illusion of perspective
+        p1 = m_projection * p1;
+        p2 = m_projection * p2;
+
+        //homogenize
+//        p1 = homogenize(p1);
+//        p2 = homogenize(p2);
+
+        // clipping for viewport..?
+        p1 = clipLine(p1,p2);
+        p2 = clipLine(p2,p1);
+
+        draw_line(Point2D(p1[0], p1[1]), Point2D(p2[0], p2[1]));
+    }
+
+    // GNOMON GNOMON GNOMON GNOMON GNOMON
+    std::vector<Line3D> linesGnomonCube = m_cube.gnomon.getLines();
+    Matrix4x4 cube_gnomon = m_cube.gnomon.getTransform();
+    for(std::vector<Line3D>::iterator it = linesGnomonCube.begin(); it != linesGnomonCube.end(); ++it) {
+
+        Line3D line = *it;
+        // Get the points and apply the model matrix
+        Point3D p1 = cube_gnomon * line.getP1();
+        Point3D p2 = cube_gnomon * line.getP2();
+        std::cout << p1 << "," << p2 << "\n";
         // Fill this in: Apply the view matrix
 //        p1 = view_matrix * p1;
 //        p2 = view_matrix * p2;
