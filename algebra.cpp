@@ -159,34 +159,6 @@ Point3D &Line3D::getP2()
     return p2_;
 }
 
-Triangle::Triangle()
-{
-    verts_.push_back(Point3D(0,0,0));
-    verts_.push_back(Point3D(0,100,0));
-    verts_.push_back(Point3D(0,100,0));
-    verts_.push_back(Point3D(100,0,0));
-    verts_.push_back(Point3D(100,0,0));
-    verts_.push_back(Point3D(0,0,0));
-}
-
-Triangle::~Triangle() { }
-
-Matrix4x4 Triangle::getTransform() const
-{
-    return this->transform_;
-}
-
-void Triangle::resetTransform()
-{
-    this->transform_ = Matrix4x4();
-}
-
-
-void Triangle::appendTransform(const Matrix4x4 &xform)
-{
-    this->transform_ = this->transform_ * xform;
-}
-
 std::vector<Line3D> Triangle::getLines()
 {
     std::vector<Line3D> lines;
@@ -247,37 +219,39 @@ std::vector<Line3D> Gnomon::getLines()
 
 Cube::Cube()
 {
+    int newParameter = 100;
+    edgeLength = newParameter;
     //front ?
     verts_.push_back(Point3D(0,0,0));
-    verts_.push_back(Point3D(0,100,0));
-    verts_.push_back(Point3D(0,100,0));
-    verts_.push_back(Point3D(100,100,0));
-    verts_.push_back(Point3D(100,100,0));
-    verts_.push_back(Point3D(100,0,0));
-    verts_.push_back(Point3D(100,0,0));
+    verts_.push_back(Point3D(0,newParameter,0));
+    verts_.push_back(Point3D(0,newParameter,0));
+    verts_.push_back(Point3D(newParameter,newParameter,0));
+    verts_.push_back(Point3D(newParameter,newParameter,0));
+    verts_.push_back(Point3D(newParameter,0,0));
+    verts_.push_back(Point3D(newParameter,0,0));
     verts_.push_back(Point3D(0,0,0));
 
     //back
-    verts_.push_back(Point3D(0,0,100));
-    verts_.push_back(Point3D(0,100,100));
-    verts_.push_back(Point3D(0,100,100));
-    verts_.push_back(Point3D(100,100,100));
-    verts_.push_back(Point3D(100,100,100));
-    verts_.push_back(Point3D(100,0,100));
-    verts_.push_back(Point3D(100,0,100));
-    verts_.push_back(Point3D(0,0,100));
+    verts_.push_back(Point3D(0,0,newParameter));
+    verts_.push_back(Point3D(0,newParameter,newParameter));
+    verts_.push_back(Point3D(0,newParameter,newParameter));
+    verts_.push_back(Point3D(newParameter,newParameter,newParameter));
+    verts_.push_back(Point3D(newParameter,newParameter,newParameter));
+    verts_.push_back(Point3D(newParameter,0,newParameter));
+    verts_.push_back(Point3D(newParameter,0,newParameter));
+    verts_.push_back(Point3D(0,0,newParameter));
 
     //top
-    verts_.push_back(Point3D(0,  100,   0   ));
-    verts_.push_back(Point3D(0,  100,   100 ));
-    verts_.push_back(Point3D(100,100,   0   ));
-    verts_.push_back(Point3D(100,100,   100 ));
+    verts_.push_back(Point3D(0,  newParameter,   0   ));
+    verts_.push_back(Point3D(0,  newParameter,   newParameter ));
+    verts_.push_back(Point3D(newParameter,newParameter,   0   ));
+    verts_.push_back(Point3D(newParameter,newParameter,   newParameter ));
 
     //bottom
     verts_.push_back(Point3D(0,   0,    0   ));
-    verts_.push_back(Point3D(0,   0,    100 ));
-    verts_.push_back(Point3D(100, 0,    0   ));
-    verts_.push_back(Point3D(100, 0,    100 ));
+    verts_.push_back(Point3D(0,   0,    newParameter ));
+    verts_.push_back(Point3D(newParameter, 0,    0   ));
+    verts_.push_back(Point3D(newParameter, 0,    newParameter ));
 
     scale_factor_x = 1.0;
     scale_factor_y = 1.0;
@@ -288,9 +262,9 @@ Cube::~Cube() { }
 
 Matrix4x4 Cube::getTransform() const
 {
-    Matrix4x4 other = Matrix4x4(Vector4D(1,   0,  0,  -50*scale_factor_x  ),
-                                Vector4D(0,   1,  0,  -50*scale_factor_y  ),
-                                Vector4D(0,   0,  1,  -50*scale_factor_z  ),
+    Matrix4x4 other = Matrix4x4(Vector4D(1,   0,  0,  -edgeLength*scale_factor_x/2  ),
+                                Vector4D(0,   1,  0,  -edgeLength*scale_factor_y/2  ),
+                                Vector4D(0,   0,  1,  -edgeLength*scale_factor_z/2  ),
                                 Vector4D(0,   0,  0,  1    ));
 
     return this->translationTransform_ * rotationTransform_ * other *this->getScaleTransform();
@@ -302,9 +276,6 @@ void Cube::resetTransform()
     this->gnomon.resetTransform();
 
     this->translationTransform_= Matrix4x4();
-//    this->translationTransform_[0][3] = -50;
-//    this->translationTransform_[1][3] = -50;
-//    this->translationTransform_[2][3] = -50;
     this->rotationTransform_ = (Matrix4x4());
     this->setScaleX(1);
     this->setScaleY(1);

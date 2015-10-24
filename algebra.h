@@ -72,7 +72,7 @@ public:
     v_[2] = 0.0;
   }
   Point3D(double x, double y, double z)
-  { 
+  {
     v_[0] = x;
     v_[1] = y;
     v_[2] = z;
@@ -92,17 +92,64 @@ public:
     return *this;
   }
 
-  double& operator[](size_t idx) 
+  double& operator[](size_t idx)
   {
     return v_[ idx ];
   }
-  double operator[](size_t idx) const 
+  double operator[](size_t idx) const
   {
     return v_[ idx ];
   }
 
 private:
   double v_[3];
+};
+
+class Point4D
+{
+public:
+  Point4D()
+  {
+    v_[0] = 0.0;
+    v_[1] = 0.0;
+    v_[2] = 0.0;
+    v_[3] = 0.0;
+  }
+  Point4D(double x, double y, double z, double w)
+  {
+    v_[0] = x;
+    v_[1] = y;
+    v_[2] = z;
+    v_[3] = w;
+  }
+  Point4D(const Point4D& other)
+  {
+    v_[0] = other.v_[0];
+    v_[1] = other.v_[1];
+    v_[2] = other.v_[2];
+    v_[3] = other.v_[3];
+  }
+
+  Point4D& operator =(const Point4D& other)
+  {
+    v_[0] = other.v_[0];
+    v_[1] = other.v_[1];
+    v_[2] = other.v_[2];
+    v_[3] = other.v_[3];
+    return *this;
+  }
+
+  double& operator[](size_t idx)
+  {
+    return v_[ idx ];
+  }
+  double operator[](size_t idx) const
+  {
+    return v_[ idx ];
+  }
+
+private:
+  double v_[4];
 };
 
 class Vector3D
@@ -246,6 +293,7 @@ public:
     v_[2] = z;
     v_[3] = w;
   }
+
   Vector4D(const Vector4D& other)
   {
     v_[0] = other.v_[0];
@@ -564,6 +612,7 @@ private:
     std::vector<Point3D> verts_;
     Matrix4x4 translationTransform_;
     Matrix4x4 rotationTransform_;
+    int edgeLength;
 };
 
 #endif // ALGEBRA_H

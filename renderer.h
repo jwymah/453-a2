@@ -44,6 +44,10 @@ public:
 
     Point3D clipPoint(Point3D point);
     Point3D clipLine(Point3D p1, Point3D p2);
+    Matrix4x4 clipNearPlane(Matrix4x4 p, Matrix4x4 q);
+    Point3D homogenize(Matrix4x4 p);
+
+    void drawObject(std::vector<Line3D> linesGnomonCube, Matrix4x4 cube_gnomon);
 protected:
 
 	// Events we implement
@@ -79,7 +83,8 @@ private:
 
 	// *** Fill me in ***
     // You will want to declare some more matrices here
-	Matrix4x4 m_projection;
+    Matrix4x4 m_projection;
+    Matrix4x4 m_projection_ortho;
     Point2D m_viewport[2];
     double viewport_x_min;
     double viewport_x_max;
@@ -102,8 +107,6 @@ private:
     bool mode_model_scale;
 
     int magnitude;
-
-    Triangle m_demoTriangle;
 
     Cube m_cube;
 };
