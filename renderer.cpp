@@ -168,8 +168,8 @@ void Renderer::drawObject(std::vector<Line3D> linesGnomonCube, Matrix4x4 cube_gn
         {
             continue;
         }
-        pp1 = clipNearPlane(pp1,pp2);
-        pp2 = clipNearPlane(pp2,pp1);
+        pp1 = clipNearAndFarPlanes(pp1,pp2);
+        pp2 = clipNearAndFarPlanes(pp2,pp1);
 
         // Apply the projection matrix
         // projection matrix provides the illusion of perspective
@@ -225,27 +225,33 @@ void Renderer::paintGL()
     draw_complete();
 }
 
-Matrix4x4 Renderer::clipNearPlane(Matrix4x4 p, Matrix4x4 q)
+Matrix4x4 Renderer::clipNearAndFarPlanes(Matrix4x4 p, Matrix4x4 q)
 {
     // line from q to p.. p is out, clip p to near plane
     if (p[2][2] < n)
     {
-        float d = (float) p[2][2] / n;
+        // line qp is now qp' where qp' = d*qp and p' lies on the near plane
+        // x = x * n/z
+        float deltaX = p[0][0] - q[0][0];
+        float deltaY = p[1][1] - q[1][1];
+        float deltaZ = p[2][2] - q[2][2];
+        float newDeltaZ = n - q[2][2];
 
-        Vector3D qp = Vector3D(p[0][0] - q[0][0], p[1][1] - q[1][1], n);
-        p[0][0] = q[0][0] + qp[0]*d;
-        p[1][1] = q[1][1] + qp[1]*d;
+        p[0][0] = q[0][0] + deltaX/deltaZ * newDeltaZ;
+        p[1][1] = q[1][1] + deltaY/deltaZ * newDeltaZ;
         p[2][2] = n;
     }
 
     // line from q to p is outside far plane
     else if (p[2][2] > f)
     {
-        float d = (float) p[2][2] / n;
+        float deltaX = p[0][0] - q[0][0];
+        float deltaY = p[1][1] - q[1][1];
+        float deltaZ = p[2][2] - q[2][2];
+        float newDeltaZ = q[2][2] - f;
 
-        Vector3D qp = Vector3D(p[0][0] - q[0][0], p[1][1] - q[1][1], n);
-        p[0][0] = q[0][0] + qp[0]*d;
-        p[1][1] = q[1][1] + qp[1]*d;
+        p[0][0] = q[0][0] - deltaX/deltaZ * newDeltaZ;
+        p[1][1] = q[1][1] - deltaY/deltaZ * newDeltaZ;
         p[2][2] = f;
 
     }
@@ -260,12 +266,12 @@ Point3D Renderer::homogenize(Matrix4x4 point)
 // called by the Qt GUI system, to allow OpenGL to respond to widget resizing
 void Renderer::resizeGL(int width, int height)
 {
-    m_viewport[0] = Point2D(10, 10);
-    m_viewport[1] = Point2D(width-10, height-10);
-    viewport_x_min = 10;
-    viewport_x_max = width-10;
-    viewport_y_min = 10;
-    viewport_y_max = height-10;
+    viewport_x_min = width * 0.05;
+    viewport_x_max = width * 0.95;
+    viewport_y_min = height * 0.05;
+    viewport_y_max = height * 0.95;
+    m_viewport[0] = Point2D(viewport_x_min, viewport_y_min);
+    m_viewport[1] = Point2D(viewport_x_max, viewport_y_max);
     aspectRatio = (float) width / height;
 }
 

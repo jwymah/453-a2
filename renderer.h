@@ -44,7 +44,7 @@ public:
 
     Point3D clipPoint(Point3D point);
     Point3D clipLine(Point3D p1, Point3D p2);
-    Matrix4x4 clipNearPlane(Matrix4x4 p, Matrix4x4 q);
+    Matrix4x4 clipNearAndFarPlanes(Matrix4x4 p, Matrix4x4 q);
     Point3D homogenize(Matrix4x4 p);
 
     void drawObject(std::vector<Line3D> linesGnomonCube, Matrix4x4 cube_gnomon);
